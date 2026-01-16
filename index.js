@@ -34,12 +34,30 @@ async function run() {
 
     const parcelCollection = client.db('zap-shift-DB').collection('parcels');
 
+    app.get('/parcels', async(req, res)=>{
+      const result = await parcelCollection.find().toArray();
+      res.send(result)
+    })
+
+    app.get('/parcels', async(req, res)=>{
+      const userEmail = req.query.email;
+      
+      const query = userEmail ? {created_by: userEmail}: {};
+      const options ={
+        sort:{ createdAt: -1}
+      }
+      const result = await parcelCollection.find(query, options).toArray();
+      res.status(201).send(result)
+    })
+
+
     app.post('/parcels', async(req, res)=>{
       const parcel = req.body;
       const result = await parcelCollection.insertOne(parcel);
       res.status(201).send(result)
     })
 
+    
 
 
     // Send a ping to confirm a successful connection
