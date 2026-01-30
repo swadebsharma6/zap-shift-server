@@ -34,6 +34,7 @@ async function run() {
 
     const parcelCollection = client.db("zap-shift-DB").collection("parcels");
     const paymentsCollection = client.db("zap-shift-DB").collection("payments");
+    const trackingCollection = client.db("zap-shift-DB").collection("trackings");
 
     app.get("/parcels", async (req, res) => {
       const result = await parcelCollection.find().toArray();
@@ -65,6 +66,30 @@ async function run() {
       const result = await parcelCollection.deleteOne(query);
       res.send(result);
     });
+
+    // tracking Related Api
+
+  app.post("/tracking", async (req, res) => {
+  const {tracking_id, parcel_id, status, message, updated_by=''} = req.body;
+
+  const log ={
+    tracking_id,
+    parcel_id: parcel_id ? new ObjectId(parcel_id) : undefined,
+    status,
+    message,
+    time: new Date(),
+    updated_by
+  }
+
+  // save parcel
+  const result = await trackingCollection.insertOne(log);
+
+  res.send(result);
+});
+
+
+
+
 // GET: payments
 app.get('/payments', async(req, res)=>{
   try{
